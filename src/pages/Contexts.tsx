@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Trash } from "react-feather";
 
 import Loader from "../components/Loader";
 
@@ -35,6 +36,7 @@ export default function Contexts() {
               .then((x) => x.json())
               .then((y) => setContexts(y.contexts))
           );
+          setTitle("");
         }}
       >
         <input
@@ -48,7 +50,25 @@ export default function Contexts() {
         {contexts ? (
           <>
             {contexts.map((context) => (
-              <li key={context._id}>{context.title}</li>
+              <li key={context._id}>
+                {context.title}
+                <button
+                  onClick={() => {
+                    fetch(
+                      `${process.env.REACT_APP_BACKEND_URL_DEV}context/${context._id}`,
+                      {
+                        method: "DELETE",
+                      }
+                    ).then((x) =>
+                      fetch(`${process.env.REACT_APP_BACKEND_URL_DEV}context`)
+                        .then((x) => x.json())
+                        .then((y) => setContexts(y.contexts))
+                    );
+                  }}
+                >
+                  <Trash />
+                </button>
+              </li>
             ))}
           </>
         ) : (
