@@ -1,48 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-interface Categorie {
-  title: string;
-  _id: string;
-}
+import Contexts from "./pages/Contexts";
+import Filter from "./pages/Filter";
+import Projects from "./pages/Projects";
+import Tasks from "./pages/Tasks";
+import Header from "./components/Header";
 
-function App() {
-  const [contexts, setContexts] = useState<Categorie[] | null>(null);
-  useEffect(() => {
-    const fetchContexts = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}context`,
-          { method: "GET" }
-        );
-        if (response.ok) {
-          const datas = await response.json();
-          if (datas.success) setContexts(datas.contexts);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchContexts();
-  }, []);
-
+export default function App() {
   return (
-    <div className="App">
-      <header>
-        <button>Agir</button>
-        <button>S'organiser</button>
-      </header>
-      <aside>
-        {contexts !== null ? (
-          contexts.map((context) => (
-            <div key={context._id}>{context.title}</div>
-          ))
-        ) : (
-          <div></div>
-        )}
-      </aside>
-      <main></main>
-    </div>
+    <>
+      <Router>
+        <Header />
+        <Switch>
+          <Route path="/tasks">
+            <Tasks />
+          </Route>
+          <Route path="/contexts">
+            <Contexts />
+          </Route>
+          <Route path="/projects">
+            <Projects />
+          </Route>
+          <Route path="/">
+            <Filter />
+          </Route>
+        </Switch>
+      </Router>
+    </>
   );
 }
-
-export default App;

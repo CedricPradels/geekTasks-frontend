@@ -1,0 +1,8 @@
+.header .nav {
+  display: flex;
+  background-color: gray;
+}
+
+.header .nav .button.active {
+  background-color: red;
+}
