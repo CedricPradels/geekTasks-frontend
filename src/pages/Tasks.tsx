@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from "react";
 
-import Loader from "../components/Loader";
+import { Trash, Radio } from "react-feather";
+
+import Loader from "../components/atoms/Loader";
+
+import TextInput from "../components/atoms/TextInput";
+import Title from "../components/atoms/Title";
+import Button from "../components/atoms/Button";
+import TitleBox from "../components/organisms/TitleBox";
+import List from "../components/molecules/List";
+import ListItem from "../components/atoms/ListItem";
+import CheckInput from "../components/atoms/CheckInput";
+import RadioInput from "../components/atoms/RadioInput";
+
+import Default from "../components/templates/Default";
 
 interface Project {
   title: string;
@@ -28,31 +41,34 @@ export default function Tasks() {
   const [title, setTitle] = useState("");
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_BACKEND_URL_DEV}context`)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}context`)
       .then((x) => x.json())
       .then((y) =>
         setContexts(
           y.contexts.map((context: Context) => ({ ...context, checked: false }))
         )
       );
-    fetch(`${process.env.REACT_APP_BACKEND_URL_DEV}project`)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}project`)
       .then((x) => x.json())
       .then((y) =>
         setProjects(
           y.projects.map((project: Project) => ({ ...project, checked: false }))
         )
       );
-    fetch(`${process.env.REACT_APP_BACKEND_URL_DEV}task`)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}task/search`, {
+      method: "POST",
+    })
       .then((x) => x.json())
       .then((y) => setTasks(y.tasks));
   }, []);
 
   return (
-    <>
+    <Default>
+      <Title level={2}>New Task</Title>
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          fetch(`${process.env.REACT_APP_BACKEND_URL_DEV}task`, {
+          fetch(`${process.env.REACT_APP_BACKEND_URL}task`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -62,27 +78,33 @@ export default function Tasks() {
               contexts: contexts?.filter((x) => x.checked),
               project: projects?.filter((x) => x.checked)[0],
             }),
-          }).then((x) => setTitle(""));
+          }).then((x) => {
+            fetch(`${process.env.REACT_APP_BACKEND_URL}task/search`, {
+              method: "POST",
+            })
+              .then((x) => x.json())
+              .then((y) => setTasks(y.tasks));
+            setTitle("");
+          });
         }}
       >
         <div>
-          <input
+          <TextInput
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <button type="submit">Create</button>
+          <Button type="submit">Create</Button>
         </div>
-        <div>
+
+        <TitleBox title="Contexts list">
           {contexts ? (
-            <ul>
+            <List>
               {contexts.map((context) => (
-                <li key={context._id}>
-                  <input
-                    id={context._id}
-                    type="checkbox"
+                <ListItem key={context._id}>
+                  <CheckInput
                     checked={context.checked}
-                    onChange={(e) => {
+                    onClick={(e) => {
                       setContexts(
                         contexts.map((x) =>
                           x._id === context._id
@@ -93,27 +115,27 @@ export default function Tasks() {
                     }}
                   />
                   <label htmlFor={context._id}>{context.title}</label>
-                </li>
+                </ListItem>
               ))}
-            </ul>
+            </List>
           ) : (
             <Loader />
           )}
-        </div>
-        <div>
+        </TitleBox>
+        <TitleBox title="Projects list">
           {projects ? (
-            <ul>
+            <List>
               {projects.map((project) => (
-                <li key={project._id}>
-                  <input
+                <ListItem key={project._id}>
+                  <RadioInput
                     id={project._id}
-                    type="radio"
-                    name="project"
                     checked={project.checked}
-                    onChange={() => {
+                    onClick={() => {
                       setProjects(
                         projects.map((x) =>
-                          x._id === project._id
+                          project.checked
+                            ? { ...x, checked: false }
+                            : x._id === project._id
                             ? { ...x, checked: true }
                             : { ...x, checked: false }
                         )
@@ -121,14 +143,45 @@ export default function Tasks() {
                     }}
                   />
                   <label htmlFor={project._id}>{project.title}</label>
-                </li>
+                </ListItem>
               ))}
-            </ul>
+            </List>
           ) : (
             <Loader />
           )}
-        </div>
+        </TitleBox>
       </form>
-    </>
+      <TitleBox title="Tasks list">
+        {tasks ? (
+          <List>
+            {tasks.map((task) => (
+              <ListItem key={task._id}>
+                <Button
+                  onClick={() => {
+                    fetch(
+                      `${process.env.REACT_APP_BACKEND_URL}task/${task._id}`,
+                      {
+                        method: "DELETE",
+                      }
+                    ).then((x) =>
+                      fetch(`${process.env.REACT_APP_BACKEND_URL}task/search`, {
+                        method: "POST",
+                      })
+                        .then((x) => x.json())
+                        .then((y) => setTasks(y.tasks))
+                    );
+                  }}
+                >
+                  <Trash style={{ height: "1rem" }} />
+                </Button>
+                {task.title}
+              </ListItem>
+            ))}
+          </List>
+        ) : (
+          <Loader />
+        )}
+      </TitleBox>
+    </Default>
   );
 }

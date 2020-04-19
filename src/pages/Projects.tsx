@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Trash } from "react-feather";
 
-import Loader from "../components/Loader";
+import Loader from "../components/atoms/Loader";
+import Default from "../components/templates/Default";
+
+import TextInput from "../components/atoms/TextInput";
+import Title from "../components/atoms/Title";
+import Button from "../components/atoms/Button";
+
+import TitleBox from "../components/organisms/TitleBox";
+import ListItem from "../components/atoms/ListItem";
+import List from "../components/molecules/List";
 
 interface Project {
   _id: string;
@@ -13,17 +22,18 @@ export default function Projects() {
   const [title, setTitle] = useState("");
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_BACKEND_URL_DEV}project`)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}project`)
       .then((x) => x.json())
       .then((y) => setProjects(y.projects));
   }, []);
 
   return (
-    <>
+    <Default>
+      <Title level={1}>New project</Title>
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          fetch(`${process.env.REACT_APP_BACKEND_URL_DEV}project`, {
+          fetch(`${process.env.REACT_APP_BACKEND_URL}project`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -32,49 +42,51 @@ export default function Projects() {
               title,
             }),
           }).then((x) =>
-            fetch(`${process.env.REACT_APP_BACKEND_URL_DEV}project`)
+            fetch(`${process.env.REACT_APP_BACKEND_URL}project`)
               .then((x) => x.json())
               .then((y) => setProjects(y.projects))
           );
           setTitle("");
         }}
       >
-        <input
+        <TextInput
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="title"
+          type="text"
         />
-        <button type="submit">Add</button>
+        <Button type="submit">Add</Button>
       </form>
-      <ul>
-        {projects ? (
-          <>
-            {projects.map((project) => (
-              <li key={project._id}>
-                {project.title}{" "}
-                <button
-                  onClick={() => {
-                    fetch(
-                      `${process.env.REACT_APP_BACKEND_URL_DEV}project/${project._id}`,
-                      {
-                        method: "DELETE",
-                      }
-                    ).then((x) =>
-                      fetch(`${process.env.REACT_APP_BACKEND_URL_DEV}project`)
-                        .then((x) => x.json())
-                        .then((y) => setProjects(y.projects))
-                    );
-                  }}
-                >
-                  <Trash />
-                </button>
-              </li>
-            ))}
-          </>
-        ) : (
-          <Loader />
-        )}
-      </ul>
-    </>
+      <TitleBox title="Projects list">
+        <List>
+          {projects ? (
+            <>
+              {projects.map((project) => (
+                <ListItem key={project._id}>
+                  <Button
+                    onClick={() => {
+                      fetch(
+                        `${process.env.REACT_APP_BACKEND_URL}project/${project._id}`,
+                        {
+                          method: "DELETE",
+                        }
+                      ).then((x) =>
+                        fetch(`${process.env.REACT_APP_BACKEND_URL}project`)
+                          .then((x) => x.json())
+                          .then((y) => setProjects(y.projects))
+                      );
+                    }}
+                  >
+                    <Trash style={{ height: "1rem" }} />
+                  </Button>
+                  {project.title}{" "}
+                </ListItem>
+              ))}
+            </>
+          ) : (
+            <Loader />
+          )}
+        </List>
+      </TitleBox>
+    </Default>
   );
 }

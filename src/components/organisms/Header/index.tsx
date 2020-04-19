@@ -1,15 +1,18 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import "./style.css";
 import classNames from "classnames";
 
 export default function Header() {
-  const [navData, setNavData] = useState([
-    ["Filter", "/", true],
-    ["Tasks", "/tasks", false],
-    ["Contexts", "/contexts", false],
-    ["Projects", "/projects", false],
-  ]);
+  const location = useLocation();
+  const [navData, setNavData] = useState(
+    [
+      ["Filter", "/"],
+      ["Tasks", "/tasks"],
+      ["Contexts", "/contexts"],
+      ["Projects", "/projects"],
+    ].map((x) => (x[1] === location.pathname ? [...x, true] : [...x, false]))
+  );
 
   const history = useHistory();
   const hundleClick = (path: string) => () => {
@@ -25,13 +28,13 @@ export default function Header() {
     <header className="header">
       <nav className="nav">
         {navData.map((x) => (
-          <button
+          <div
             key={`${x[0]}`}
             onClick={hundleClick(`${x[1]}`)}
-            className={classNames("button", { active: x[2] })}
+            className={classNames("item", { active: x[2] })}
           >
             {x[0]}
-          </button>
+          </div>
         ))}
       </nav>
     </header>

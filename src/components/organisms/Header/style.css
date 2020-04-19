@@ -1,0 +1,32 @@
+.header {
+  background-color: var(--color5);
+  padding: 0 200px;
+  border-bottom: 2px solid var(--color2);
+}
+
+.header .nav {
+  display: flex;
+}
+
+.header .nav .item:hover {
+  text-shadow: 0 0 5px var(--color2);
+}
+
+.header .nav .item {
+  cursor: pointer;
+  color: var(--color2);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: normal;
+}
+
+.header .nav .item.active {
+  color: var(--color4);
+  font-weight: bold;
+}
+
+.header .nav .item.active:hover {
+  text-shadow: 0 0 5px var(--color4);
+}

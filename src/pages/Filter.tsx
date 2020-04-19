@@ -1,18 +1,28 @@
 import React, { useState } from "react";
 
-import ContextsFilter from "../components/ContextsFilter";
-import TasksDisplay from "../components/TasksDisplay";
+import ContextsFilter from "../components/organisms/ContextsFilter";
+import TasksDisplay from "../components/organisms/TasksDisplay";
+
+import TitleBox from "../components/organisms/TitleBox";
+
+import Default from "../components/templates/Default";
 
 export default function Filter() {
   const [contexts, setContexts] = useState([]);
   return (
-    <main style={{ display: "flex" }}>
-      <aside>
-        <ContextsFilter setState={setContexts} />
-      </aside>
-      <section>
-        <TasksDisplay contexts={contexts} />
-      </section>
-    </main>
+    <Default>
+      <main style={{ display: "flex" }}>
+        <aside>
+          <TitleBox title="Filters list">
+            <ContextsFilter setState={setContexts} />
+          </TitleBox>
+        </aside>
+        <section>
+          <TitleBox title="Result">
+            <TasksDisplay contexts={contexts} />
+          </TitleBox>
+        </section>
+      </main>
+    </Default>
   );
 }
