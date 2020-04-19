@@ -20,34 +20,57 @@ export default function Contexts() {
   const [contexts, setContexts] = useState<null | Context[]>(null);
   const [title, setTitle] = useState("");
 
+  const fetchContexts = async () => {
+    const response = await (
+      await fetch(`${process.env.REACT_APP_BACKEND_URL}context`)
+    ).json();
+    setContexts(response.contexts);
+  };
+
+  const deleteProject = async (id: string) => {
+    await fetch(`${process.env.REACT_APP_BACKEND_URL}context/${id}`, {
+      method: "DELETE",
+    });
+  };
+
+  const handleDeleteClick = (id: string) => async () => {
+    await deleteProject(id);
+    fetchContexts();
+  };
+
+  const resetTitle = () => {
+    setTitle("");
+  };
+
+  const createContext = async (title: string) => {
+    await fetch(`${process.env.REACT_APP_BACKEND_URL}context`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title,
+      }),
+    });
+  };
+
+  const handleSubmit = (title: string) => async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+    await createContext(title);
+    fetchContexts();
+    resetTitle();
+  };
+
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_BACKEND_URL}context`)
-      .then((x) => x.json())
-      .then((y) => setContexts(y.contexts));
+    fetchContexts();
   }, []);
 
   return (
     <Default>
-      <Title level={2}>New contact</Title>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          fetch(`${process.env.REACT_APP_BACKEND_URL}context`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              title,
-            }),
-          }).then((x) =>
-            fetch(`${process.env.REACT_APP_BACKEND_URL}context`)
-              .then((x) => x.json())
-              .then((y) => setContexts(y.contexts))
-          );
-          setTitle("");
-        }}
-      >
+      <Title level={2}>New context</Title>
+      <form onSubmit={handleSubmit(title)}>
         <TextInput
           type="text"
           value={title}
@@ -61,20 +84,7 @@ export default function Contexts() {
             <>
               {contexts.map((context) => (
                 <ListItem key={context._id}>
-                  <Button
-                    onClick={() => {
-                      fetch(
-                        `${process.env.REACT_APP_BACKEND_URL}context/${context._id}`,
-                        {
-                          method: "DELETE",
-                        }
-                      ).then((x) =>
-                        fetch(`${process.env.REACT_APP_BACKEND_URL}context`)
-                          .then((x) => x.json())
-                          .then((y) => setContexts(y.contexts))
-                      );
-                    }}
-                  >
+                  <Button onClick={handleDeleteClick(context._id)}>
                     <Trash style={{ height: "1rem" }} />
                   </Button>
                   {context.title}

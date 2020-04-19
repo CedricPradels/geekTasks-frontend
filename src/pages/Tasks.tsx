@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Trash, Radio } from "react-feather";
+import { Trash } from "react-feather";
 
 import Loader from "../components/atoms/Loader";
 

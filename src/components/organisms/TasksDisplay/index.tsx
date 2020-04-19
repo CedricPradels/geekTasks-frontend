@@ -12,46 +12,45 @@ interface Props {
   contexts: string[];
 }
 
+interface Task {
+  title: string;
+  _id: string;
+}
+
+interface Response {
+  success: boolean;
+  tasks: Task[];
+}
+
 export default function TasksDisplay({ contexts }: Props) {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<any | Task[]>(null);
+
+  const handleClickDelete = (id: string) => () => {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}task/${id}`, {
+      method: "DELETE",
+    });
+    setData((x: Task) => data.filter((y: Task) => y._id !== id));
+  };
 
   useEffect(() => {
-    const getTasks = async () => {
-      const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}task/search`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ contextsId: contexts }),
-        }
-      );
-      setData(await response.json());
-    };
-    getTasks();
+    fetch(`${process.env.REACT_APP_BACKEND_URL}task/search`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ contextsId: contexts }),
+    })
+      .then((x) => x.json())
+      .then((y: Response) => setData(y.tasks));
   }, [contexts]);
 
   return (
     <List>
       {data !== null ? (
         <>
-          {data.tasks.map((task: any) => (
+          {data.map((task: Task) => (
             <ListItem key={task._id}>
-              <Button
-                onClick={(e) => {
-                  fetch(
-                    `${process.env.REACT_APP_BACKEND_URL}task/${task._id}`,
-                    {
-                      method: "DELETE",
-                    }
-                  );
-                  setData((x: any) => ({
-                    success: x.success,
-                    tasks: x.tasks.filter((y: any) => y._id !== task._id),
-                  }));
-                }}
-              >
+              <Button onClick={handleClickDelete(task._id)}>
                 <Trash style={{ height: "1rem" }} />
               </Button>
               {task.title}

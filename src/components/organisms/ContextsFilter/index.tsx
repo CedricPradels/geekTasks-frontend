@@ -19,7 +19,7 @@ interface Contexts {
 }
 
 interface Props {
-  setState: any;
+  setState: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const ContextsFilter = ({ setState }: Props) => {
