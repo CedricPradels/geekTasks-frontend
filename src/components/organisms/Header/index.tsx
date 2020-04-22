@@ -3,6 +3,9 @@ import { useHistory, useLocation } from "react-router-dom";
 import "./style.css";
 import classNames from "classnames";
 
+import cookies from "../../../helpers/cookies";
+import { Zap, ZapOff } from "react-feather";
+
 export default function Header() {
   const location = useLocation();
   const [navData, setNavData] = useState(
@@ -37,6 +40,28 @@ export default function Header() {
           </div>
         ))}
       </nav>
+      <div className="log">
+        {cookies.get("geekTasksToken") ? (
+          <div
+            onClick={() => {
+              cookies.delete("geekTasksToken");
+              history.push("/signup");
+            }}
+            className="disconnect"
+          >
+            <ZapOff />
+          </div>
+        ) : (
+          <div
+            onClick={() => {
+              history.push("/signin");
+            }}
+            className="connect"
+          >
+            <Zap />
+          </div>
+        )}
+      </div>
     </header>
   );
 }
