@@ -10,6 +10,7 @@ import List from "../components/molecules/List";
 import ListItem from "../components/atoms/ListItem";
 
 import Default from "../components/templates/Default";
+import cookies from "../helpers/cookies";
 
 interface Context {
   _id: string;
@@ -22,7 +23,11 @@ export default function Contexts() {
 
   const fetchContexts = async () => {
     const response = await (
-      await fetch(`${process.env.REACT_APP_BACKEND_URL}context`)
+      await fetch(`${process.env.REACT_APP_BACKEND_URL}context`, {
+        headers: {
+          Authorization: `Bearer ${cookies.get("geekTasksToken")}`,
+        },
+      })
     ).json();
     setContexts(response.contexts);
   };
@@ -30,6 +35,9 @@ export default function Contexts() {
   const deleteProject = async (id: string) => {
     await fetch(`${process.env.REACT_APP_BACKEND_URL}context/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${cookies.get("geekTasksToken")}`,
+      },
     });
   };
 
@@ -47,6 +55,7 @@ export default function Contexts() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${cookies.get("geekTasksToken")}`,
       },
       body: JSON.stringify({
         title,

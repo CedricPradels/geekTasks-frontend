@@ -6,6 +6,7 @@ import "./style.css";
 import ListItem from "../../atoms/ListItem";
 import List from "../../molecules/List";
 import CheckInput from "../../atoms/CheckInput";
+import cookies from "../../../helpers/cookies";
 
 interface Context {
   _id: string;
@@ -26,7 +27,11 @@ const ContextsFilter = ({ setState }: Props) => {
   const [contexts, setContexts] = useState<null | Context[]>(null);
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_BACKEND_URL}context`)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}context`, {
+      headers: {
+        Authorization: `Bearer ${cookies.get("geekTasksToken")}`,
+      },
+    })
       .then((x) => x.json())
       .then((y) =>
         setContexts(

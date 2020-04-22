@@ -12,6 +12,8 @@ import TitleBox from "../components/organisms/TitleBox";
 import ListItem from "../components/atoms/ListItem";
 import List from "../components/molecules/List";
 
+import cookies from "../helpers/cookies";
+
 interface Project {
   _id: string;
   title: string;
@@ -24,6 +26,9 @@ export default function Projects() {
   const deleteProject = async (id: string) => {
     await fetch(`${process.env.REACT_APP_BACKEND_URL}project/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${cookies.get("geekTasksToken")}`,
+      },
     });
   };
 
@@ -32,6 +37,7 @@ export default function Projects() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${cookies.get("geekTasksToken")}`,
       },
       body: JSON.stringify({
         title,
@@ -55,7 +61,11 @@ export default function Projects() {
 
   const fetchProjects = async () => {
     const response = await (
-      await fetch(`${process.env.REACT_APP_BACKEND_URL}project`)
+      await fetch(`${process.env.REACT_APP_BACKEND_URL}project`, {
+        headers: {
+          Authorization: `Bearer ${cookies.get("geekTasksToken")}`,
+        },
+      })
     ).json();
     setProjects(response.projects);
   };

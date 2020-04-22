@@ -18,7 +18,7 @@ interface User {
 export default function Signin() {
   const history = useHistory();
 
-  const [form, handleChange, resetForm] = useInput({
+  const [form, handleChange] = useInput({
     email: "cedric.pradels@gmail.com",
     password: "123456",
   });
@@ -81,7 +81,7 @@ export default function Signin() {
               />
             </ListItem>
           </List>
-          <Button type="submit">Create</Button>
+          <Button type="submit">Login</Button>
         </form>
       </TitleBox>
       <Link to="/signup">Sign Up ?</Link>

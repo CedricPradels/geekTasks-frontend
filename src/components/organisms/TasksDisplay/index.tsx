@@ -7,6 +7,7 @@ import ListItem from "../../atoms/ListItem";
 import List from "../../molecules/List";
 
 import Button from "../../atoms/Button";
+import cookies from "../../../helpers/cookies";
 
 interface Props {
   contexts: string[];
@@ -28,6 +29,9 @@ export default function TasksDisplay({ contexts }: Props) {
   const handleClickDelete = (id: string) => () => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}task/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${cookies.get("geekTasksToken")}`,
+      },
     });
     setData((x: Task) => data.filter((y: Task) => y._id !== id));
   };
@@ -37,11 +41,14 @@ export default function TasksDisplay({ contexts }: Props) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${cookies.get("geekTasksToken")}`,
       },
       body: JSON.stringify({ contextsId: contexts }),
     })
       .then((x) => x.json())
-      .then((y: Response) => setData(y.tasks));
+      .then((y: Response) => {
+        setData(y.tasks);
+      });
   }, [contexts]);
 
   return (

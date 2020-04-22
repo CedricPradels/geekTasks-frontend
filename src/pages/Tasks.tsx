@@ -15,6 +15,8 @@ import RadioInput from "../components/atoms/RadioInput";
 
 import Default from "../components/templates/Default";
 
+import cookies from "../helpers/cookies";
+
 interface Project {
   title: string;
   _id: string;
@@ -41,14 +43,22 @@ export default function Tasks() {
   const [title, setTitle] = useState("");
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_BACKEND_URL}context`)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}context`, {
+      headers: {
+        Authorization: `Bearer ${cookies.get("geekTasksToken")}`,
+      },
+    })
       .then((x) => x.json())
       .then((y) =>
         setContexts(
           y.contexts.map((context: Context) => ({ ...context, checked: false }))
         )
       );
-    fetch(`${process.env.REACT_APP_BACKEND_URL}project`)
+    fetch(`${process.env.REACT_APP_BACKEND_URL}project`, {
+      headers: {
+        Authorization: `Bearer ${cookies.get("geekTasksToken")}`,
+      },
+    })
       .then((x) => x.json())
       .then((y) =>
         setProjects(
@@ -57,6 +67,9 @@ export default function Tasks() {
       );
     fetch(`${process.env.REACT_APP_BACKEND_URL}task/search`, {
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${cookies.get("geekTasksToken")}`,
+      },
     })
       .then((x) => x.json())
       .then((y) => setTasks(y.tasks));
@@ -72,6 +85,7 @@ export default function Tasks() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${cookies.get("geekTasksToken")}`,
             },
             body: JSON.stringify({
               title,
@@ -81,6 +95,9 @@ export default function Tasks() {
           }).then((x) => {
             fetch(`${process.env.REACT_APP_BACKEND_URL}task/search`, {
               method: "POST",
+              headers: {
+                Authorization: `Bearer ${cookies.get("geekTasksToken")}`,
+              },
             })
               .then((x) => x.json())
               .then((y) => setTasks(y.tasks));
@@ -162,10 +179,20 @@ export default function Tasks() {
                       `${process.env.REACT_APP_BACKEND_URL}task/${task._id}`,
                       {
                         method: "DELETE",
+                        headers: {
+                          Authorization: `Bearer ${cookies.get(
+                            "geekTasksToken"
+                          )}`,
+                        },
                       }
                     ).then((x) =>
                       fetch(`${process.env.REACT_APP_BACKEND_URL}task/search`, {
                         method: "POST",
+                        headers: {
+                          Authorization: `Bearer ${cookies.get(
+                            "geekTasksToken"
+                          )}`,
+                        },
                       })
                         .then((x) => x.json())
                         .then((y) => setTasks(y.tasks))

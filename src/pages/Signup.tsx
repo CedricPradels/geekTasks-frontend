@@ -9,8 +9,6 @@ import List from "../components/molecules/List";
 import ListItem from "../components/atoms/ListItem";
 import useInput from "../helpers/hooks/useInput";
 
-import cookies from "../helpers/cookies";
-
 interface User {
   email: string;
   username: string;
